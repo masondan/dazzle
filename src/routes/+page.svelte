@@ -3,7 +3,7 @@
 	import CustomersTab from '$lib/components/CustomersTab.svelte';
 	import DashboardTab from '$lib/components/DashboardTab.svelte';
 
-	let activeTab = $state('stock');
+	let activeTab = $state('dashboard');
 </script>
 
 <div class="mobile-container">
@@ -110,7 +110,7 @@
 	.bottom-nav .nav-icon {
 		width: 28px;
 		height: 28px;
-		opacity: 0.35;
+		opacity: 0.5;
 		transition: opacity 0.2s;
 	}
 

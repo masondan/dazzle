@@ -10,7 +10,7 @@
 	let customFrom = $state('');
 	let customTo = $state('');
 	let showDatePicker = $state(false);
-	let openSection = $state('money');
+	let openSection = $state(null);
 	let showCostForm = $state(false);
 	let editingCost = $state(null);
 	let showSupplierForm = $state(false);
@@ -424,6 +424,9 @@
 			</div>
 		{/if}
 	</div>
+
+	<!-- Watermark logo -->
+	<img src="/logos/logo-dazzle-trs.png" alt="" class="dash-watermark" />
 </div>
 
 {#if showCostForm}
@@ -459,6 +462,19 @@
 <style>
 	.dashboard-container {
 		padding: 16px;
+		position: relative;
+		min-height: 100%;
+	}
+
+	.dash-watermark {
+		position: fixed;
+		bottom: 20%;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 180px;
+		opacity: 0.08;
+		pointer-events: none;
+		z-index: 0;
 	}
 
 	/* Date filter buttons */
@@ -561,6 +577,8 @@
 		overflow: hidden;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 		margin-bottom: 12px;
+		position: relative;
+		z-index: 1;
 	}
 
 	.dash-card.open {

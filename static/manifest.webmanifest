@@ -1,0 +1,27 @@
+{
+	"name": "Dazzle by Dorah",
+	"short_name": "Dazzle",
+	"description": "Sales & Inventory Tracker",
+	"start_url": "/",
+	"display": "standalone",
+	"background_color": "#ffffff",
+	"theme_color": "#AA0171",
+	"icons": [
+		{
+			"src": "/logos/logo-dazzle-192.png",
+			"sizes": "192x192",
+			"type": "image/png"
+		},
+		{
+			"src": "/logos/logo-dazzle-gen.png",
+			"sizes": "512x512",
+			"type": "image/png"
+		},
+		{
+			"src": "/logos/logo-dazzle-maskable.png",
+			"sizes": "1024x1024",
+			"type": "image/png",
+			"purpose": "maskable"
+		}
+	]
+}
