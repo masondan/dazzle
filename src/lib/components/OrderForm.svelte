@@ -34,7 +34,7 @@
 	let customerName = $state(editOrder?.customerName ?? '');
 	let customerPhone = $state('');
 	let phones = $state(editOrder?.customerPhone ? editOrder.customerPhone.split(', ') : ['']);
-	let addresses = $state(editOrder?.addresses?.length ? editOrder.addresses.map(a => ({ ...a })) : [{ type: 'Home', address: '' }]);
+	let address = $state(editOrder?.addresses?.length ? editOrder.addresses.map(a => a.address).join('\n') : '');
 	let source = $state(editOrder?.source ?? '');
 	let notes = $state(editOrder?.notes ?? '');
 	let paymentMethod = $state(editOrder?.paymentMethod ?? 'Bank transfer');
@@ -60,16 +60,7 @@
 		phones = [...phones, ''];
 	}
 
-	function addAddress() {
-		const types = ['Home', 'Work', 'Other'];
-		const usedTypes = addresses.map(a => a.type);
-		const next = types.find(t => !usedTypes.includes(t)) || 'Other';
-		addresses = [...addresses, { type: next, address: '' }];
-	}
 
-	function removeAddress(idx) {
-		addresses = addresses.filter((_, i) => i !== idx);
-	}
 
 	function selectProduct(product) {
 		const existing = selectedItems.find(i => i.productId === product.id);
@@ -133,7 +124,7 @@
 		onsubmit({
 			customerName: customerName.trim(),
 			customerPhone: allPhones.join(', '),
-			addresses: addresses.filter(a => a.address.trim()),
+			addresses: address.trim() ? [{ type: '', address: address.trim() }] : [],
 			source,
 			notes: notes.trim(),
 			paymentMethod,
@@ -200,28 +191,12 @@
 
 		<div class="form-group">
 			<label>Delivery address</label>
-			{#each addresses as addr, idx}
-				<div class="address-row">
-					<select bind:value={addr.type} class="addr-type">
-						<option>Home</option>
-						<option>Work</option>
-						<option>Other</option>
-					</select>
-					<textarea
-						class="addr-input"
-						bind:value={addr.address}
-						placeholder="Enter address"
-						rows="1"
-						oninput={autoGrow}
-					></textarea>
-					{#if addresses.length > 1}
-						<button type="button" class="btn-remove-addr" onclick={() => removeAddress(idx)}>×</button>
-					{/if}
-				</div>
-			{/each}
-			{#if addresses.length < 3}
-				<button type="button" class="btn-add-link" onclick={addAddress}>+ Add address</button>
-			{/if}
+			<textarea
+				bind:value={address}
+				placeholder="Enter address"
+				rows="2"
+				oninput={autoGrow}
+			></textarea>
 		</div>
 
 		<div class="form-group">
@@ -447,51 +422,6 @@
 		font-weight: 600;
 		cursor: pointer;
 		padding: 4px 0;
-	}
-
-	/* Address */
-	.address-row {
-		display: flex;
-		gap: 6px;
-		margin-bottom: 6px;
-		align-items: flex-start;
-	}
-
-	.addr-type {
-		width: 76px;
-		flex-shrink: 0;
-		padding: 10px 4px;
-		border: 1px solid #ddd;
-		border-radius: 6px;
-		font-size: var(--font-helper);
-		font-family: inherit;
-		color: var(--text-body);
-	}
-
-	.addr-input {
-		flex: 1;
-		padding: 10px;
-		border: 1px solid #ddd;
-		border-radius: 6px;
-		font-size: var(--font-body);
-		font-family: inherit;
-		color: var(--text-body);
-		resize: none;
-		overflow: hidden;
-		min-height: 42px;
-		line-height: 1.4;
-	}
-
-	.btn-remove-addr {
-		width: 32px;
-		height: 42px;
-		flex-shrink: 0;
-		background: #f0f0f0;
-		border: 1px solid #ddd;
-		border-radius: 6px;
-		cursor: pointer;
-		font-size: 16px;
-		color: #999;
 	}
 
 	/* Item search */

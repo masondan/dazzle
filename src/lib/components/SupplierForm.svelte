@@ -12,6 +12,11 @@
 		phones = [...phones, ''];
 	}
 
+	function autoGrow(e) {
+		e.target.style.height = 'auto';
+		e.target.style.height = e.target.scrollHeight + 'px';
+	}
+
 	function handleSubmit() {
 		if (!name.trim()) return;
 
@@ -48,7 +53,7 @@
 
 		<div class="form-group">
 			<label>Notes</label>
-			<textarea bind:value={notes}></textarea>
+			<textarea bind:value={notes} rows="2" oninput={autoGrow}></textarea>
 		</div>
 
 		<div class="form-actions">
@@ -116,8 +121,9 @@
 	}
 
 	.form-group textarea {
-		resize: vertical;
-		min-height: 80px;
+		resize: none;
+		overflow: hidden;
+		min-height: 42px;
 	}
 
 	.phone-input {
