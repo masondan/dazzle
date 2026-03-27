@@ -203,7 +203,7 @@
 
 <div class="customers-container">
 	<button class="btn-new" onclick={() => { editingOrder = null; showForm = true; }}>
-		+ New order | lead
+		+ New order <span class="btn-sep"></span> lead
 	</button>
 
 	<div class="status-pills">
@@ -442,6 +442,15 @@
 
 	.btn-new:active {
 		background: #7a0054;
+	}
+
+	.btn-sep {
+		display: inline-block;
+		width: 1px;
+		height: 14px;
+		background: rgba(255, 255, 255, 0.45);
+		vertical-align: middle;
+		margin: 0 6px;
 	}
 
 	/* Status pills */
