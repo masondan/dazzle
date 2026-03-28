@@ -101,7 +101,10 @@
 					name: 'dazzle_user',
 					displayName: 'Dazzle User'
 				},
-				pubKeyCredParams: [{ alg: -7, type: 'public-key' }],
+				pubKeyCredParams: [
+					{ alg: -7, type: 'public-key' },   // ES256
+					{ alg: -257, type: 'public-key' }  // RS256
+				],
 				authenticatorSelection: {
 					authenticatorAttachment: 'platform',
 					userVerification: 'preferred'
@@ -355,7 +358,7 @@
 	}
 
 	.error-message {
-		color: var(--dazzle-light);
+		color: rgba(255, 255, 255, 0.9);
 		font-size: var(--font-helper);
 		margin: 12px 0 0 0;
 		font-weight: 500;
