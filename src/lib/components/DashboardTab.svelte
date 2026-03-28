@@ -16,9 +16,15 @@
 	let showSupplierForm = $state(false);
 	let editingSupplier = $state(null);
 	let deleteConfirm = $state(null);
+	let toastMessage = $state('');
 
 	function toggleSection(name) {
 		openSection = openSection === name ? null : name;
+	}
+
+	function showToast(msg) {
+		toastMessage = msg;
+		setTimeout(() => { toastMessage = ''; }, 2500);
 	}
 
 	function parseDate(dateStr) {
@@ -171,6 +177,7 @@
 		entries.forEach(c => costsStore.addCost(c));
 		costsStore.sync();
 		showCostForm = false;
+		showToast('Cost saved');
 	}
 
 	function handleUpdateCost(entries) {
@@ -180,6 +187,7 @@
 		}
 		showCostForm = false;
 		editingCost = null;
+		showToast('Cost saved');
 	}
 
 	function openEditCost(cost) {
@@ -196,6 +204,7 @@
 		suppliersStore.addSupplier(data);
 		suppliersStore.sync();
 		showSupplierForm = false;
+		showToast('Supplier saved');
 	}
 
 	function handleUpdateSupplier(data) {
@@ -203,6 +212,7 @@
 		suppliersStore.sync();
 		showSupplierForm = false;
 		editingSupplier = null;
+		showToast('Supplier saved');
 	}
 
 	function openEditSupplier(supplier) {
@@ -237,6 +247,91 @@
 
 	function cancelDeleteConfirm() {
 		deleteConfirm = null;
+	}
+
+	function exportToCSV() {
+		const timestamp = new Date().toISOString().split('T')[0];
+		
+		// Helper to convert array to CSV
+		function arrayToCSV(data, headers) {
+			const rows = [headers.join(',')];
+			data.forEach(item => {
+				const values = headers.map(h => {
+					const val = item[h];
+					if (val === null || val === undefined) return '';
+					const str = String(val).replace(/"/g, '""');
+					return /[,"\n]/.test(str) ? `"${str}"` : str;
+				});
+				rows.push(values.join(','));
+			});
+			return rows.join('\n');
+		}
+
+		// Export orders
+		const orderHeaders = ['id', 'date', 'customerName', 'customerPhone', 'source', 'status', 'paymentMethod', 'notes'];
+		const orderData = ordersStore.orders.map(o => ({
+			id: o.id,
+			date: o.date,
+			customerName: o.customerName,
+			customerPhone: o.customerPhone,
+			source: o.source,
+			status: o.status,
+			paymentMethod: o.paymentMethod,
+			notes: o.notes
+		}));
+		const ordersCSV = arrayToCSV(orderData, orderHeaders);
+
+		// Export inventory
+		const invHeaders = ['id', 'name', 'category', 'supplier', 'wholesaleCost', 'retailPrice', 'stock', 'notes', 'dateEntered'];
+		const invData = inventoryStore.products.map(p => ({
+			id: p.id,
+			name: p.name,
+			category: p.category,
+			supplier: p.supplier,
+			wholesaleCost: p.wholesaleCost,
+			retailPrice: p.retailPrice,
+			stock: p.stock,
+			notes: p.notes,
+			dateEntered: p.dateEntered
+		}));
+		const invCSV = arrayToCSV(invData, invHeaders);
+
+		// Export costs
+		const costHeaders = ['id', 'date', 'costType', 'description', 'amount'];
+		const costData = costsStore.costs.map(c => ({
+			id: c.id,
+			date: c.date,
+			costType: c.costType,
+			description: c.description,
+			amount: c.amount
+		}));
+		const costsCSV = arrayToCSV(costData, costHeaders);
+
+		// Export suppliers
+		const suppHeaders = ['id', 'name', 'phones', 'email'];
+		const suppData = suppliersStore.suppliers.map(s => ({
+			id: s.id,
+			name: s.name,
+			phones: s.phones?.join('; ') || '',
+			email: s.email || ''
+		}));
+		const suppCSV = arrayToCSV(suppData, suppHeaders);
+
+		// Create combined text file with all exports
+		const allData = `=== DAZZLE BACKUP ${timestamp} ===\n\n` +
+			`ORDERS\n${ordersCSV}\n\n` +
+			`INVENTORY\n${invCSV}\n\n` +
+			`COSTS\n${costsCSV}\n\n` +
+			`SUPPLIERS\n${suppCSV}`;
+
+		// Trigger download
+		const blob = new Blob([allData], { type: 'text/csv' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `dazzle-backup-${timestamp}.csv`;
+		a.click();
+		URL.revokeObjectURL(url);
 	}
 </script>
 
@@ -345,6 +440,9 @@
 				<div class="metric-row">
 					<span class="metric-label">Average order value</span>
 					<span class="metric-value">₦{activity.avgOrderValue.toLocaleString()}</span>
+				</div>
+				<div class="export-row">
+					<button type="button" class="btn-export" onclick={exportToCSV}>Download all data</button>
 				</div>
 			</div>
 		{/if}
@@ -457,6 +555,10 @@
 			</div>
 		</div>
 	</div>
+{/if}
+
+{#if toastMessage}
+	<div class="toast">{toastMessage}</div>
 {/if}
 
 <style>
@@ -809,5 +911,61 @@
 	.btn-modal-delete {
 		background: #d32f2f;
 		color: white;
+	}
+
+	.export-row {
+		display: flex;
+		justify-content: center;
+		padding: 12px 0 0 0;
+		margin-top: 12px;
+	}
+
+	.btn-export {
+		background: none;
+		border: none;
+		color: var(--dazzle);
+		font-size: var(--font-body);
+		font-weight: 600;
+		cursor: pointer;
+		padding: 0;
+		text-decoration: none;
+	}
+
+	.btn-export:active {
+		opacity: 0.8;
+	}
+
+	.toast {
+		position: fixed;
+		bottom: 72px;
+		left: 50%;
+		transform: translateX(-50%);
+		background: var(--dazzle);
+		color: white;
+		padding: 10px 24px;
+		border-radius: 8px;
+		font-size: var(--font-helper);
+		font-weight: 500;
+		z-index: 400;
+		animation: fadeInOut 2.5s ease;
+	}
+
+	@keyframes fadeInOut {
+		0% {
+			opacity: 0;
+			transform: translateX(-50%) translateY(10px);
+		}
+		10% {
+			opacity: 1;
+			transform: translateX(-50%) translateY(0);
+		}
+		90% {
+			opacity: 1;
+			transform: translateX(-50%) translateY(0);
+		}
+		100% {
+			opacity: 0;
+			transform: translateX(-50%) translateY(10px);
+		}
 	}
 </style>

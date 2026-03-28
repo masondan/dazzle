@@ -4,7 +4,7 @@
 	"description": "Sales & Inventory Tracker",
 	"start_url": "/",
 	"display": "standalone",
-	"background_color": "#ffffff",
+	"background_color": "#AA0171",
 	"theme_color": "#AA0171",
 	"icons": [
 		{

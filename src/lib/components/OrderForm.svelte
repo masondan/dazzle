@@ -34,7 +34,7 @@
 	let customerName = $state(editOrder?.customerName ?? '');
 	let customerPhone = $state('');
 	let phones = $state(editOrder?.customerPhone ? editOrder.customerPhone.split(', ') : ['']);
-	let address = $state(editOrder?.addresses?.length ? editOrder.addresses.map(a => a.address).join('\n') : '');
+	let addresses = $state(editOrder?.addresses?.length ? editOrder.addresses : [{type: '', address: ''}]);
 	let source = $state(editOrder?.source ?? '');
 	let notes = $state(editOrder?.notes ?? '');
 	let paymentMethod = $state(editOrder?.paymentMethod ?? 'Bank transfer');
@@ -58,6 +58,12 @@
 
 	function addPhone() {
 		phones = [...phones, ''];
+	}
+
+	function addAddress() {
+		if (addresses.length < 3) {
+			addresses = [...addresses, {type: '', address: ''}];
+		}
 	}
 
 
@@ -117,6 +123,7 @@
 
 	function handleSubmit() {
 		const allPhones = phones.filter(p => p.trim());
+		const allAddresses = addresses.filter(a => a.address.trim());
 		if (!customerName.trim()) { alert('Please enter customer name'); return; }
 		if (allPhones.length === 0) { alert('Please enter a phone number'); return; }
 		if (selectedItems.length === 0) { alert('Please add at least one item'); return; }
@@ -124,7 +131,7 @@
 		onsubmit({
 			customerName: customerName.trim(),
 			customerPhone: allPhones.join(', '),
-			addresses: address.trim() ? [{ type: '', address: address.trim() }] : [],
+			addresses: allAddresses,
 			source,
 			notes: notes.trim(),
 			paymentMethod,
@@ -191,12 +198,18 @@
 
 		<div class="form-group">
 			<label>Delivery address</label>
-			<textarea
-				bind:value={address}
-				placeholder="Enter address"
-				rows="2"
-				oninput={autoGrow}
-			></textarea>
+			{#each addresses as addr, idx}
+				<textarea
+					bind:value={addresses[idx].address}
+					placeholder="Enter address"
+					rows="2"
+					oninput={autoGrow}
+					class="address-input"
+				></textarea>
+			{/each}
+			{#if addresses.length < 3}
+				<button type="button" class="btn-add-link" onclick={addAddress}>+ Address</button>
+			{/if}
 		</div>
 
 		<div class="form-group">
@@ -414,6 +427,10 @@
 		margin-bottom: 6px;
 	}
 
+	.address-input {
+		margin-bottom: 6px;
+	}
+
 	.btn-add-link {
 		background: none;
 		border: none;
@@ -422,6 +439,10 @@
 		font-weight: 600;
 		cursor: pointer;
 		padding: 4px 0;
+	}
+
+	.form-group .address-input + .btn-add-link {
+		margin-top: -4px;
 	}
 
 	/* Item search */

@@ -2,11 +2,13 @@
 	import StockTab from '$lib/components/StockTab.svelte';
 	import CustomersTab from '$lib/components/CustomersTab.svelte';
 	import DashboardTab from '$lib/components/DashboardTab.svelte';
+	import AuthSplash from '$lib/components/AuthSplash.svelte';
 
 	let activeTab = $state('dashboard');
 </script>
 
-<div class="mobile-container">
+<AuthSplash>
+	<div class="mobile-container">
 	<header class="header">
 		<img src="/logos/logo-dazzle-logotype.png" alt="Dazzle" class="header-logo" />
 	</header>
@@ -44,7 +46,8 @@
 			<img src="/icons/icon-customers.svg" alt="" class="nav-icon" />
 		</button>
 	</nav>
-</div>
+	</div>
+</AuthSplash>
 
 <style>
 	:global(body) {
